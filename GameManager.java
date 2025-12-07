@@ -4,19 +4,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.io.Console;
 
-// add console screen flusher later 
 
 public class GameManager {
     /* attributes: all object references
     */
-    private Console console = null;
     private MainCharacter main_character;
     private static Scanner input = new Scanner(System.in);
-    private ArrayList<Location> map_locations = new ArrayList<Location>();
     private AIRobot ai_robot;
     private AISentinel ai_sentinel;
+    private TravelMap map;
     private Location home; 
     private Location office;
     private Location robot_factory;
@@ -33,75 +30,61 @@ public class GameManager {
 
     public GameManager()
     {
-        // create a console object
-        
-        try
-        {
-            console = System.console();
 
-        }
-        catch (Exception e)
-        {
-            System.out.println("Something went wrong...");
-        }
-        
+        // initialize MAP
+        map = new TravelMap();
+
         // initialize HOME location (name, clue, title)
         home_clue = new Clue("File Folder", "For years, I have been researching how to get rid of these Evil AI robots form out city. Here is one piece of the algorithm to deconstruct them. Find the other two clues to save the city. - Father");
-        home_title = Days.MON + "2:00 AM - HOME, Jane St. Toronto";
-        home = new Location("Home", home_clue, home_title);
-        home.addAction("Search Bookshelf", "Searching bookshelf...\nYou find a file folder.\nPress 1 to read its contents.");
-        home.setCutsceneText("It is past midnight, and you sit alone at the dining table, experiencing another sleepless night. It has been like this ever since then, when the damage first occurred…");
-        // add more here actions later
+        String home_title = Days.MON + " 2:00 AM - HOME, Jane St. Toronto";
+        home = new Location("Home", home_clue, home_title, false);
         
-        map_locations.add(home);
+        // can now initialize main_character with home location
+        main_character = new MainCharacter(null, 100, 30, home); 
+
+        home.addAction(new ActionChoice("Search Bookshelf", "Searching bookshelf...\nYou find a file folder.\nPress 1 to read its contents.", home_clue, main_character));
+        home.addAction(new ActionChoice("Check Phone Notifications", "Your phone has no new notifications.", null, main_character));
+        home.addAction(new ActionChoice("Search a kitchen cupboard for some empty dishes", "Nothing here..You remind yourself to do the dishes later.", null, main_character));
+        home.setCutsceneText("It is past midnight, and you sit alone at the dining table, experiencing another sleepless night. It has been like this ever since then, when the damage first occurred…");
+
+        map.addLocation(home);
         
         // initialize ABANDONED OFFICE location
-        office_title = Days.MON + " 5:00 AM - 17 Arlington Avenue...";
+        String office_title = Days.MON + " 5:00 AM - 17 Arlington Avenue...";
         abandoned_clue = new Clue("USB Stick", "Message: Xyik]$ڒXݗ");
-        office = new AbandonedOffice("Abandoned Office", abandoned_clue, office_title);
+        office = new Location("Abandoned Office", abandoned_clue, office_title, true);
         office.setCutsceneText("You enter an abandoned office and look around...");
-        office.addAction("Search a file cabinet", "You search the file cabinet and find a labelled USB Stick, which you think matches the one your father spoke about, containing documentation of the artificial intelligence technology. Press 1 to equip.");
-        map_locations.add(office);
+        office.addAction(new ActionChoice("Search a file cabinet", "You search the file cabinet and find a labelled USB Stick, which you think matches the one your father spoke about, containing documentation of the artificial intelligence technology. Press 1 to equip.", abandoned_clue, main_character));
+        office.addAction(new ActionChoice("Turn on a computer", "Shoot. You need a password.", null, main_character));
+        office.addAction(new ActionChoice("Pick up a paper from the floor", "Nothing here...Just a financial statement.", null, main_character));
+        map.addLocation(office);
         
         // initialize ROBOT FACTORY location
-        factory_title = Days.TUE + " 7:00 AM - TSMC...";
-        factory_actions.add("Inspect the conveyor belt");
-        factory_actions.add("Inspect the hardware");
+        String factory_title = Days.TUE + " 7:00 AM - TSMC...";
         factory_clue = new Clue("Memory Chip", "Message: 01100101010");
-        robot_factory = new RobotFactory("Robot Factory", factory_clue, factory_title);
+        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true);
         robot_factory.setCutsceneText("The sun is rising as you arrive at the factory, entering through the back window - while avoiding cameras - you weave through many crates and spot a revolving conveyor belt with lots of hardware. You walk closer to...");
-        robot_factory.addAction("Inspect the hardware", "Inspecting hardware...\nItem found: Memory Chip.\n Press 1 to read its contents.");
-        robot_factory.addAction("Inspect the conveyor belt", "Inspecting conveyor belt...\n Item found: Nothing.\n Press 1 to try again.");
-        map_locations.add(robot_factory);
+        robot_factory.addAction(new ActionChoice("Inspect the hardware", "Inspecting hardware...\nItem found: Memory Chip.\n Press 1 to read its contents.", factory_clue, main_character));
+        robot_factory.addAction(new ActionChoice("Inspect the conveyor belt", "Inspecting conveyor belt...\n Item found: Nothing.\n Press 1 to try again.", null, main_character));
+        map.addLocation(robot_factory);
         
         // initialize GOV HEADQUARTERS location
 
-        hq_title = Days.WED + " 9:00 AM - City Hall...";
-        hq_actions.add("Use File Folder Contents");
+        String hq_title = Days.WED + " 9:00 AM - City Hall...";
        // hq_actions.add("Use USB Contents");
        // hq_actions.add("Use Memory Chip Contents");
-        headquarters = new GovHeadquarters("Government Headquarters", null, hq_title);
+        headquarters = new Location("Government Headquarters", null, hq_title, false);
         headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
-        headqaurters.addAction("Use File Folder Contents", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.");
-        map_locations.add(headquarters);
+        headquarters.addAction(new ActionChoice("Hack into a computer", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.", null, main_character));
+        map.addLocation(headquarters);
         
         // initialize enemies 
         ai_robot = new AIRobot(90, "EASY", "32321H8");
         ai_sentinel = new AISentinel(100, "HARD", "32135557");
     }
     
-    public void flushScreen()
-    {
-        if(console != null)
-        {
-            console.flush();
-        }
-    }
-    
     public void showStartingScreen()
     {
-        
-
         System.out.println("PROTOCOL: DECONSTRUCT");
         System.out.println("1 - Start");
         System.out.println("2 - Quit");
@@ -114,9 +97,9 @@ public class GameManager {
                 playBeginningCutscene();
                 break;
             case 2:
-                System.out.println("Quitting the program");
+                // add 'are u sure' prompt
+                System.out.println("Thank you for playing.");
                 break;
-                // ask if they want to quit, exit the program
             case 3:
                 System.out.println("Showing leaderboard");
                 break;
@@ -126,8 +109,7 @@ public class GameManager {
     
     public void playBeginningCutscene()
     {
-        console.flush();
-        
+
         try{
         File cutscene_text = new File("beginning_cutscene.txt");
         Scanner cutscene_reader = new Scanner(cutscene_text);
@@ -153,8 +135,8 @@ public class GameManager {
         
         if(user_choice == 1)
         {
-            System.out.println("Entering home...");
             home.unlockLocation();
+            main_character.changeLocation(home);
             this.showLocationCutscene();// call the first location cutscene method 
         }
         }
@@ -166,90 +148,56 @@ public class GameManager {
     
     public void showLocationCutscene()
     {
+        Location users_curr_location = main_character.getCurrentLocation();
+        
         // same for all locations
-        System.out.println(main_character.getCurrentLocation().getLocationTitle());
+        System.out.println(users_curr_location.getLocationTitle());
         printDivider();
-        System.out.println(main_character.getCurrentLocation().getCutsceneText());
+        System.out.println(users_curr_location.getCutsceneText());
+        
+        // if user is at last location
         
         boolean clue_not_found = true;
         
         while(clue_not_found)
         {
             System.out.println("Select an action: ");
-            for (int i = 0; i < main_character.getCurrentLocation().getActions().size(); i++)
+            for (int i = 0; i < users_curr_location.getActions().size(); i++)
             {
-                System.out.println(i+1 + ". " + main_character.getCurrentLocation().getActions().get(i));
+                System.out.println(i+1 + ". " + users_curr_location.getActions().get(i).getText());
             }
             
             // get user input for action selected
             int action_num = input.nextInt(); 
-    
-            // create a local currnet location var to reduce duplication
-            
-            System.out.println(main_character.getCurrentLocation().getActionResult());
-            press_one_to_continue();
-            main_character.analyze();
+            ArrayList<ActionChoice> actions = users_curr_location.getActions();
+            ActionChoice action_chosen = actions.get(action_num-1); // entire object
+            // find corresponding actionchoice object, get its result text
+            System.out.println(action_chosen.getResult()); // result text
 
-            
-            switch(main_character.getCurrentLocation().getName())
+            if(users_curr_location.getName().equals("Government Headquarters"))
             {
-
-                // switch statement bc each location has diff behaviour, 
-                // change repetitive code later
-                case "Home": // no combat
-                    // print action result
-                    System.out.println(home.getClue());
-                    // let user pick up clue 
-                    main_character.pickUpClue(home_clue);
-                    clue_not_found = false;
-                    office.unlockLocation();
-                    press_one_to_continue();
-                    printClueUnlockedMessage();
-
-                    break;
-                    
-                case "Abandoned Office": // combat
-                    System.out.println(office.getClue());
-                    main_character.pickUpClue(abandoned_clue);
-                    clue_not_found = false;
-                    robot_factory.unlockLocation();
-                    press_one_to_continue();
-                    showCombatCutscene();
-                    printClueUnlockedMessage();
-
-                    break;
-                    
-                case "Robot Factory": 
-                    // The only case to obtain clue is for a specific input index. 
-                    // To simplify logic (else) all other numbers can print their own action result
-                    if(action_num == 1) // conveyor belt
+                clue_not_found = false; 
+                showEndingCutscene();
+                showEndingStats(); // end of program
+            }
+            else
+            {
+                press_one_to_continue();
+                if(action_chosen.hasClue())
+                {
+                    if(users_curr_location.hasCombat())
                     {
-                        System.out.println("Inspecting the conveyor belt...No clue found, please try again.");
-                    }
-                    else // hardware
-                    {
-                        System.out.println(robot_factory.getClue());
-                        main_character.pickUpClue(factory_clue);
-                        headquarters.unlockLocation();
-                        clue_not_found = false;
-                        press_one_to_continue();
                         showCombatCutscene();
-                        printClueUnlockedMessage();
                     }
-
-                    break;
-                
-                case "Government Headquarters":
-                    clue_not_found = false;
-                    System.out.println(headquarters.getActionResult());
-                    // add switch statements later 
-                    // call ending cutscene
-                    showEndingCutscene();
-                    showEndingStats();
-                    break;
-                default:
-                    break;
                     
+                    main_character.analyze();
+                    System.out.println(users_curr_location.getClue().getText());
+                    main_character.pickUpClue(users_curr_location.getClue());
+                    clue_not_found = false;
+                    map.unlockLocation(users_curr_location); 
+                    press_one_to_continue();
+                    printClueUnlockedMessage();
+                }
             }
         }
     }
@@ -286,7 +234,14 @@ public class GameManager {
     
     
     public void printClueUnlockedMessage(){
-        System.out.println("Clue unlocked! " + (3-main_character.getCluesCollected().size()) + " more to go...");
+        if(main_character.getCluesCollected().size() == 3)
+        {
+            System.out.println("You have collected all the clues. Head swiftly to the final location before darkness falls.");
+        }
+        else
+        {
+            System.out.println("Clue unlocked! " + (3-main_character.getCluesCollected().size()) + " more to go...");
+        }
         main_character.getCurrentLocation().lockLocation();
         System.out.println("Press 1 to open the travel map: ");
         // validate input
@@ -302,9 +257,9 @@ public class GameManager {
         {
             System.out.println("\nTRAVEL MAP");
             printDivider();
-            for (int i = 0; i < map_locations.size(); i++)
+            for (int i = 0; i < map.getLocations().size(); i++)
             {
-                System.out.println(i+1 + ". " + map_locations.get(i).getName() + " -- UNLOCKED: " + map_locations.get(i).isUnlocked());
+                System.out.println(i+1 + ". " + map.getLocations().get(i).getName() + " -- UNLOCKED: " + map.getLocations().get(i).isUnlocked());
             }
             
             System.out.println("Select the next location to visit: ");
@@ -320,8 +275,8 @@ public class GameManager {
                 return;
             }
             
-            if (choice > 0 && choice <= map_locations.size()){
-                Location chosenLocation = map_locations.get(choice-1);
+            if (choice > 0 && choice <= map.getLocations().size()){
+                Location chosenLocation = map.getLocations().get(choice-1);
                 
                 System.out.println(chosenLocation.getName());
                 
@@ -360,30 +315,13 @@ public class GameManager {
                 System.out.println("Enemy health: " + ai_sentinel.getHealth());
                 break;
         }
+        System.out.println("Answer the questions to defeat the robots!");
 
         press_one_to_continue();
         // go to multiple choice
         runQuizForCurrentLocation();
 
     }
-    
-   /* public void run_multiple_choice()
-    {
-        // match the choice to the location
-        switch(main_character.getCurrentLocation().getName())
-        {
-            case "Abandoned Office":
-                AbandonedOfficeQuiz(input, main_character);
-                break;
-            case "Robot Factory":
-                RobotFactoryQuiz(input, main_character);
-                break;
-            case "Government Headquarters":
-                GovernmentHeadquartersQuiz(input, main_character);
-                break;
-        }
-    }
-    */
     
     public void recordUsername() {
     try {
@@ -415,13 +353,13 @@ public class GameManager {
                 username_writer.write(username_entered + "\n"); // add newline
                 username_writer.flush(); // ensure data is written
                 username_writer.close(); // close file
-                main_character = new MainCharacter(username_entered, 100, 15, home);
+                main_character.setUsername(username_entered);
                 is_invalid = false;
             } else {
                 System.out.println("Username taken, please try again.");
             }
         }
-
+        
         showStartingScreen();
 
     } catch (IOException e) {
