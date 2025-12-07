@@ -17,18 +17,19 @@ public class GameManager {
     private ArrayList<Location> map_locations = new ArrayList<Location>();
     private AIRobot ai_robot;
     private AISentinel ai_sentinel;
-    private Home home; 
-    private AbandonedOffice office;
-    private RobotFactory robot_factory;
-    private GovHeadquarters headquarters;
+    private Location home; 
+    private Location office;
+    private Location robot_factory;
+    private Location headquarters;
     private Clue home_clue;
     private Clue abandoned_clue;
     private Clue factory_clue;
     private Quiz office_quiz;
     private Quiz factory_quiz;
     private Quiz hq_quiz;
-    private FileWriter username_writer;
+    private FileWriter username_writer; // keep as attribute or as local?
     private File username_list;
+    
 
     public GameManager()
     {
@@ -44,41 +45,49 @@ public class GameManager {
             System.out.println("Something went wrong...");
         }
         
-        // initialize HOME location
-        ArrayList<String> home_actions = new ArrayList<>();
-        home_actions.add("Search Bookshelf");
-        
+        // initialize HOME location (name, clue, title)
         home_clue = new Clue("File Folder", "For years, I have been researching how to get rid of these Evil AI robots form out city. Here is one piece of the algorithm to deconstruct them. Find the other two clues to save the city. - Father");
-        home = new Home("Home", home_actions, home_clue);
+        home_title = Days.MON + "2:00 AM - HOME, Jane St. Toronto";
+        home = new Location("Home", home_clue, home_title);
+        home.addAction("Search Bookshelf", "Searching bookshelf...\nYou find a file folder.\nPress 1 to read its contents.");
+        home.setCutsceneText("It is past midnight, and you sit alone at the dining table, experiencing another sleepless night. It has been like this ever since then, when the damage first occurred…");
+        // add more here actions later
+        
         map_locations.add(home);
         
         // initialize ABANDONED OFFICE location
-        ArrayList<String> office_actions = new ArrayList<>();
-        office_actions.add("Search a file cabinet");
+        office_title = Days.MON + " 5:00 AM - 17 Arlington Avenue...";
         abandoned_clue = new Clue("USB Stick", "Message: Xyik]$ڒXݗ");
-        office = new AbandonedOffice("Abandoned Office", office_actions, abandoned_clue);
+        office = new AbandonedOffice("Abandoned Office", abandoned_clue, office_title);
+        office.setCutsceneText("You enter an abandoned office and look around...");
+        office.addAction("Search a file cabinet", "You search the file cabinet and find a labelled USB Stick, which you think matches the one your father spoke about, containing documentation of the artificial intelligence technology. Press 1 to equip.");
         map_locations.add(office);
         
         // initialize ROBOT FACTORY location
-        ArrayList<String> factory_actions = new ArrayList<>();
+        factory_title = Days.TUE + " 7:00 AM - TSMC...";
         factory_actions.add("Inspect the conveyor belt");
         factory_actions.add("Inspect the hardware");
         factory_clue = new Clue("Memory Chip", "Message: 01100101010");
-        robot_factory = new RobotFactory("Robot Factory", factory_actions, factory_clue);
+        robot_factory = new RobotFactory("Robot Factory", factory_clue, factory_title);
+        robot_factory.setCutsceneText("The sun is rising as you arrive at the factory, entering through the back window - while avoiding cameras - you weave through many crates and spot a revolving conveyor belt with lots of hardware. You walk closer to...");
+        robot_factory.addAction("Inspect the hardware", "Inspecting hardware...\nItem found: Memory Chip.\n Press 1 to read its contents.");
+        robot_factory.addAction("Inspect the conveyor belt", "Inspecting conveyor belt...\n Item found: Nothing.\n Press 1 to try again.");
         map_locations.add(robot_factory);
         
         // initialize GOV HEADQUARTERS location
-        ArrayList<String> hq_actions = new ArrayList<>();
+
+        hq_title = Days.WED + " 9:00 AM - City Hall...";
         hq_actions.add("Use File Folder Contents");
        // hq_actions.add("Use USB Contents");
        // hq_actions.add("Use Memory Chip Contents");
-        headquarters = new GovHeadquarters("Government Headquarters", hq_actions, null);
+        headquarters = new GovHeadquarters("Government Headquarters", null, hq_title);
+        headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
+        headqaurters.addAction("Use File Folder Contents", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.");
         map_locations.add(headquarters);
         
         // initialize enemies 
         ai_robot = new AIRobot(90, "EASY", "32321H8");
         ai_sentinel = new AISentinel(100, "HARD", "32135557");
-        
     }
     
     public void flushScreen()
@@ -175,13 +184,15 @@ public class GameManager {
             // get user input for action selected
             int action_num = input.nextInt(); 
     
+            // create a local currnet location var to reduce duplication
+            
+            System.out.println(main_character.getCurrentLocation().getActionResult());
+            press_one_to_continue();
+            main_character.analyze();
+
             
             switch(main_character.getCurrentLocation().getName())
             {
-                // create a local currnet location var to reduce duplication
-                System.out.println(main_character.getCurrentLocation().getActionResult());
-                press_one_to_continue();
-                main_character.analyze();
 
                 // switch statement bc each location has diff behaviour, 
                 // change repetitive code later
@@ -208,7 +219,9 @@ public class GameManager {
 
                     break;
                     
-                case "Robot Factory": // combat, 2 action nums
+                case "Robot Factory": 
+                    // The only case to obtain clue is for a specific input index. 
+                    // To simplify logic (else) all other numbers can print their own action result
                     if(action_num == 1) // conveyor belt
                     {
                         System.out.println("Inspecting the conveyor belt...No clue found, please try again.");
@@ -219,19 +232,22 @@ public class GameManager {
                         main_character.pickUpClue(factory_clue);
                         headquarters.unlockLocation();
                         clue_not_found = false;
+                        press_one_to_continue();
+                        showCombatCutscene();
+                        printClueUnlockedMessage();
                     }
-                    press_one_to_continue();
-                    showCombatCutscene();
-                    printClueUnlockedMessage();
 
                     break;
                 
                 case "Government Headquarters":
+                    clue_not_found = false;
                     System.out.println(headquarters.getActionResult());
                     // add switch statements later 
                     // call ending cutscene
                     showEndingCutscene();
                     showEndingStats();
+                    break;
+                default:
                     break;
                     
             }
@@ -255,6 +271,7 @@ public class GameManager {
             File leaderboard_file = new File("leaderboard.txt");
             FileWriter leaderboard_writer = new FileWriter(leaderboard_file);
             leaderboard_writer.write(main_character.getStats());
+            leaderboard_writer.flush(); // instantly added
             leaderboard_writer.close();
 
         }
