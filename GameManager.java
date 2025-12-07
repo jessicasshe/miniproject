@@ -105,6 +105,7 @@ public class GameManager {
                 break;
         
         }
+        System.out.flush();
     }
     
     public void playBeginningCutscene()
@@ -144,6 +145,7 @@ public class GameManager {
         {
             System.out.println("Something went wrong.");
         }
+        System.out.flush();
     }
     
     public void showLocationCutscene()
@@ -200,6 +202,7 @@ public class GameManager {
                 }
             }
         }
+        System.out.flush();
     }
     
     public void showEndingCutscene()
@@ -246,7 +249,7 @@ public class GameManager {
         System.out.println("Press 1 to open the travel map: ");
         // validate input
         displayTravelMap();
-    };
+    }//;
     
     
     public void displayTravelMap()
@@ -291,6 +294,7 @@ public class GameManager {
                 System.out.println("Invalid selection, please try again.");
             }
         }
+        System.out.flush();
     }
     
     public void showCombatCutscene()
@@ -320,6 +324,7 @@ public class GameManager {
         press_one_to_continue();
         // go to multiple choice
         runQuizForCurrentLocation();
+        System.out.flush();
 
     }
     
