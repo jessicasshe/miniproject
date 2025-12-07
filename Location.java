@@ -1,16 +1,18 @@
-import java.util.HashMap;
+import java.util.ArrayList;
 public class Location {
     public String name;
     public boolean unlocked = false; // default: false
+    public boolean hasCombat = false;
     public Clue clue;
-    public HashMap<String, String> actions = new HashMap<>();
+    public ArrayList<ActionChoice> actions = new ArrayList<>();
     public String cutscene_text;
     public String location_title;
 
-    public Location(String name, Clue clue, location_title){
+    public Location(String name, Clue clue, String location_title, boolean has_combat){
         this.name = name;
         this.clue = clue;
         this.location_title = location_title;
+        hasCombat = has_combat;
     }
     
     public String getName(){
@@ -32,18 +34,27 @@ public class Location {
         return unlocked;
     }
     
-    // note: makes use of clue class; location owns the clue, clue given text
-    public String getClue(){
-        return clue.getText();
+    public Clue getClue()
+    {
+        return clue;
     }
     
-    public HashMap<String, String> getActions(){
+    public ArrayList<ActionChoice> getActions(){
         return actions;
     }
     
-    public HashMap<String, String> addAction(String action_desc, String result){ // use this method instread of passing in a list?
-        actions.put(action_desc, result);
+    public ArrayList<ActionChoice> addAction(ActionChoice action){ // use this method instread of passing in a list?
+        actions.add(action);
         return actions;
+    }
+    
+    public boolean hasCombat()
+    {
+        if(hasCombat)
+        {
+            return true;
+        }
+        return false;
     }
  
     public String getCutsceneText()
@@ -56,20 +67,9 @@ public class Location {
         return location_title;
     }
     
-    public String getActionResult()
-    {
-        // find action based on user input -> add paramneter
-        return;
-    }
-    
-    public setCutsceneText(String text) // long parameter
+    public String setCutsceneText(String text) // long parameter
     {
         cutscene_text = text;
         return cutscene_text;
     }
-    
-
-    
-    
-}
     
