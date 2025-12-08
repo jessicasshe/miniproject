@@ -150,6 +150,7 @@ public class GameManager {
         {
             System.out.println("Something went wrong.");
         }
+        System.out.flush();
     }
     
     public void showLocationCutscene()
