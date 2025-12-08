@@ -9,6 +9,7 @@ public class Location {
     public String location_title;
     public String combat_text; 
     public Enemy enemy;
+    public Quiz quiz;
 
     public Location(String name, Clue clue, String location_title, boolean has_combat, Enemy enemy){
         this.name = name;
@@ -16,6 +17,14 @@ public class Location {
         this.location_title = location_title;
         hasCombat = has_combat;
         this.enemy = enemy;
+    }
+
+    public Quiz getQuiz(){
+        return quiz;
+    }
+
+    public void setQuiz(){
+        this.quiz = q;
     }
     
     public String getName(){
