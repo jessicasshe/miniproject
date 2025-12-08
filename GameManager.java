@@ -7,8 +7,6 @@ import java.util.InputMismatchException;
 
 
 public class GameManager {
-    /* attributes: all object references
-    */
     private MainCharacter main_character;
     private static Scanner input = new Scanner(System.in);
     private AIRobot ai_robot;
@@ -33,11 +31,16 @@ public class GameManager {
 
         // initialize MAP
         map = new TravelMap();
+        
+        // initialize enemies 
+        ai_robot = new AIRobot(90, "EASY", "32321H8");
+        ai_sentinel = new AISentinel(100, "HARD", "32135557");
+
 
         // initialize HOME location (name, clue, title)
         home_clue = new Clue("File Folder", "For years, I have been researching how to get rid of these Evil AI robots form out city. Here is one piece of the algorithm to deconstruct them. Find the other two clues to save the city. - Father");
         String home_title = Days.MON + " 2:00 AM - HOME, Jane St. Toronto";
-        home = new Location("Home", home_clue, home_title, false);
+        home = new Location("Home", home_clue, home_title, false, null);
         
         // can now initialize main_character with home location
         main_character = new MainCharacter(null, 100, 30, home); 
@@ -48,12 +51,13 @@ public class GameManager {
         home.setCutsceneText("It is past midnight, and you sit alone at the dining table, experiencing another sleepless night. It has been like this ever since then, when the damage first occurred…");
 
         map.addLocation(home);
-        
+
         // initialize ABANDONED OFFICE location
         String office_title = Days.MON + " 5:00 AM - 17 Arlington Avenue...";
         abandoned_clue = new Clue("USB Stick", "Message: Xyik]$ڒXݗ");
-        office = new Location("Abandoned Office", abandoned_clue, office_title, true);
+        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot);
         office.setCutsceneText("You enter an abandoned office and look around...");
+        office.setCombatText("Just as you put the USB stick away, you see an eerie-looking mechanical robot, sensing a violent encounter. Solve the code to defeat it!");
         office.addAction(new ActionChoice("Search a file cabinet", "You search the file cabinet and find a labelled USB Stick, which you think matches the one your father spoke about, containing documentation of the artificial intelligence technology. Press 1 to equip.", abandoned_clue, main_character));
         office.addAction(new ActionChoice("Turn on a computer", "Shoot. You need a password.", null, main_character));
         office.addAction(new ActionChoice("Pick up a paper from the floor", "Nothing here...Just a financial statement.", null, main_character));
@@ -62,8 +66,9 @@ public class GameManager {
         // initialize ROBOT FACTORY location
         String factory_title = Days.TUE + " 7:00 AM - TSMC...";
         factory_clue = new Clue("Memory Chip", "Message: 01100101010");
-        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true);
+        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinel);
         robot_factory.setCutsceneText("The sun is rising as you arrive at the factory, entering through the back window - while avoiding cameras - you weave through many crates and spot a revolving conveyor belt with lots of hardware. You walk closer to...");
+        robot_factory.setCombatText("Just as you put the memory chip away, you see 2 eerie-looking AI Sentinels, sensing a violent encounter you equip your computer. Solve the code to defeat it!");
         robot_factory.addAction(new ActionChoice("Inspect the hardware", "Inspecting hardware...\nItem found: Memory Chip.\n Press 1 to read its contents.", factory_clue, main_character));
         robot_factory.addAction(new ActionChoice("Inspect the conveyor belt", "Inspecting conveyor belt...\n Item found: Nothing.\n Press 1 to try again.", null, main_character));
         map.addLocation(robot_factory);
@@ -73,14 +78,11 @@ public class GameManager {
         String hq_title = Days.WED + " 9:00 AM - City Hall...";
        // hq_actions.add("Use USB Contents");
        // hq_actions.add("Use Memory Chip Contents");
-        headquarters = new Location("Government Headquarters", null, hq_title, false);
+        headquarters = new Location("Government Headquarters", null, hq_title, false, null);
         headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
         headquarters.addAction(new ActionChoice("Hack into a computer", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.", null, main_character));
         map.addLocation(headquarters);
         
-        // initialize enemies 
-        ai_robot = new AIRobot(90, "EASY", "32321H8");
-        ai_sentinel = new AISentinel(100, "HARD", "32135557");
     }
     
     public void showStartingScreen()
@@ -89,6 +91,7 @@ public class GameManager {
         System.out.println("1 - Start");
         System.out.println("2 - Quit");
         System.out.println("3 - View Leaderboard");
+        
         int user_choice = input.nextInt();
         
         switch(user_choice)
@@ -102,9 +105,11 @@ public class GameManager {
                 break;
             case 3:
                 System.out.println("Showing leaderboard");
+                // implement !!!!
                 break;
         
         }
+        System.out.flush();
     }
     
     public void playBeginningCutscene()
@@ -137,7 +142,8 @@ public class GameManager {
         {
             home.unlockLocation();
             main_character.changeLocation(home);
-            this.showLocationCutscene();// call the first location cutscene method 
+            System.out.flush();
+            showLocationCutscene();// call the first location cutscene method 
         }
         }
         catch (IOException e)
@@ -155,8 +161,6 @@ public class GameManager {
         printDivider();
         System.out.println(users_curr_location.getCutsceneText());
         
-        // if user is at last location
-        
         boolean clue_not_found = true;
         
         while(clue_not_found)
@@ -169,10 +173,8 @@ public class GameManager {
             
             // get user input for action selected
             int action_num = input.nextInt(); 
-            ArrayList<ActionChoice> actions = users_curr_location.getActions();
-            ActionChoice action_chosen = actions.get(action_num-1); // entire object
-            // find corresponding actionchoice object, get its result text
-            System.out.println(action_chosen.getResult()); // result text
+            ActionChoice action_chosen = users_curr_location.getActions().get(action_num-1); // entire object
+            System.out.println(action_chosen.getResult()); // get action's result text
 
             if(users_curr_location.getName().equals("Government Headquarters"))
             {
@@ -180,6 +182,7 @@ public class GameManager {
                 showEndingCutscene();
                 showEndingStats(); // end of program
             }
+
             else
             {
                 press_one_to_continue();
@@ -187,7 +190,7 @@ public class GameManager {
                 {
                     if(users_curr_location.hasCombat())
                     {
-                        showCombatCutscene();
+                        showCombatCutscene(users_curr_location);
                     }
                     
                     main_character.analyze();
@@ -200,6 +203,7 @@ public class GameManager {
                 }
             }
         }
+        System.out.flush();
     }
     
     public void showEndingCutscene()
@@ -246,7 +250,7 @@ public class GameManager {
         System.out.println("Press 1 to open the travel map: ");
         // validate input
         displayTravelMap();
-    };
+    }
     
     
     public void displayTravelMap()
@@ -278,8 +282,6 @@ public class GameManager {
             if (choice > 0 && choice <= map.getLocations().size()){
                 Location chosenLocation = map.getLocations().get(choice-1);
                 
-                System.out.println(chosenLocation.getName());
-                
                 if (chosenLocation.isUnlocked()){
                     main_character.changeLocation(chosenLocation);
                     showLocationCutscene();
@@ -291,35 +293,25 @@ public class GameManager {
                 System.out.println("Invalid selection, please try again.");
             }
         }
+        System.out.flush();
     }
     
-    public void showCombatCutscene()
+    public void showCombatCutscene(Location curr_location) // use the same local variable
     {
         // switch to users current location 
+        
         System.out.println("DANGER!");
         printDivider();
-
-        switch(main_character.getCurrentLocation().getName())
-        {
-            case "Abandoned Office":
-                System.out.println("Just as you put the USB stick away, you see an eerie-looking mechanical robot, sensing a violent encounter. Solve the code to defeat it!");
-                System.out.println("Enemy name: " + ai_robot.getName());
-                System.out.println("Enemy difficulty: " + ai_robot.getDifficultyLevel());
-                System.out.println("Enemy health: " + ai_robot.getHealth());
-                break;
-                
-            case "Robot Factory":
-                System.out.println("Just as you put the memory chip away, you see 2 eerie-looking AI Sentinels, sensing a violent encounter you equip your computer. Solve the code to defeat it!");
-                System.out.println("Enemy name: " + ai_sentinel.getName());
-                System.out.println("Enemy difficulty: " + ai_sentinel.getDifficultyLevel());
-                System.out.println("Enemy health: " + ai_sentinel.getHealth());
-                break;
-        }
+        
+        System.out.println(curr_location.getCombatText());
+        System.out.println("Enemy name: " + curr_location.getEnemy().getName());
+        System.out.println("Enemy difficulty: " + curr_location.getEnemy().getDifficultyLevel());
+        System.out.println("Enemy health: " + curr_location.getEnemy().getHealth());
         System.out.println("Answer the questions to defeat the robots!");
-
         press_one_to_continue();
         // go to multiple choice
         runQuizForCurrentLocation();
+        System.out.flush();
 
     }
     
@@ -331,8 +323,6 @@ public class GameManager {
 
         while (is_invalid) {
             Scanner username_reader = new Scanner(username_list);
-
-
             System.out.println("Enter a username: ");
             String username_entered = input.nextLine().trim(); // safer than next()
 
