@@ -7,12 +7,15 @@ public class Location {
     public ArrayList<ActionChoice> actions = new ArrayList<>();
     public String cutscene_text;
     public String location_title;
+    public String combat_text; 
+    public Enemy enemy;
 
-    public Location(String name, Clue clue, String location_title, boolean has_combat){
+    public Location(String name, Clue clue, String location_title, boolean has_combat, Enemy enemy){
         this.name = name;
         this.clue = clue;
         this.location_title = location_title;
         hasCombat = has_combat;
+        this.enemy = enemy;
     }
     
     public String getName(){
@@ -37,6 +40,16 @@ public class Location {
     public Clue getClue()
     {
         return clue;
+    }
+    
+    public String getCombatText()
+    {
+        return combat_text;
+    }
+    
+    public Enemy getEnemy()
+    {
+        return enemy;
     }
     
     public ArrayList<ActionChoice> getActions(){
@@ -72,4 +85,15 @@ public class Location {
         cutscene_text = text;
         return cutscene_text;
     }
+    
+    public String setCombatText(String text)
+    {
+        combat_text = text;
+        return combat_text;
+    }
+    
+
+    
+    
+}
     
