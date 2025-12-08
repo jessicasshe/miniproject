@@ -140,9 +140,9 @@ public class GameManager {
         
         if(user_choice == 1)
         {
+            clearConsole();
             home.unlockLocation();
             main_character.changeLocation(home);
-            System.out.flush();
             showLocationCutscene();// call the first location cutscene method 
         }
         }
@@ -150,7 +150,7 @@ public class GameManager {
         {
             System.out.println("Something went wrong.");
         }
-        System.out.flush();
+        clearConsole();
     }
     
     public void showLocationCutscene()
@@ -187,24 +187,26 @@ public class GameManager {
             else
             {
                 press_one_to_continue();
+                clearConsole();
                 if(action_chosen.hasClue())
                 {
+                    main_character.analyze();
+                    System.out.println(users_curr_location.getClue().getText());
+                    main_character.pickUpClue(users_curr_location.getClue());
+
+                    press_one_to_continue();
+                    clearConsole();
                     if(users_curr_location.hasCombat())
                     {
                         showCombatCutscene(users_curr_location);
                     }
-                    
-                    main_character.analyze();
-                    System.out.println(users_curr_location.getClue().getText());
-                    main_character.pickUpClue(users_curr_location.getClue());
                     clue_not_found = false;
-                    map.unlockLocation(users_curr_location); 
-                    press_one_to_continue();
+                    map.unlockNextLocation(users_curr_location); 
                     printClueUnlockedMessage();
+                    press_one_to_continue();
                 }
             }
         }
-        System.out.flush();
     }
     
     public void showEndingCutscene()
@@ -212,7 +214,7 @@ public class GameManager {
         System.out.println("Ending - Rooftop, 366 Fred Well, Braunview...");
         printDivider();
         System.out.println("You look out at the vast view, reflecting on your accomplishment, but can't shake out the feeling of your existential dread. You think about the memories of him during simpler times, back when humanity hadn't totally succumbed to the consequences of their potential…");
-        
+        clearConsole();
     }
     
     public void showEndingStats()
@@ -222,7 +224,7 @@ public class GameManager {
         try
         {
             File leaderboard_file = new File("leaderboard.txt");
-            FileWriter leaderboard_writer = new FileWriter(leaderboard_file);
+            FileWriter leaderboard_writer = new FileWriter(leaderboard_file, true);
             leaderboard_writer.write(main_character.getStats());
             leaderboard_writer.flush(); // instantly added
             leaderboard_writer.close();
@@ -284,6 +286,7 @@ public class GameManager {
                 Location chosenLocation = map.getLocations().get(choice-1);
                 
                 if (chosenLocation.isUnlocked()){
+                    clearConsole();
                     main_character.changeLocation(chosenLocation);
                     showLocationCutscene();
                     invalid_choice = false;
@@ -294,7 +297,6 @@ public class GameManager {
                 System.out.println("Invalid selection, please try again.");
             }
         }
-        System.out.flush();
     }
     
     public void showCombatCutscene(Location curr_location) // use the same local variable
@@ -310,9 +312,10 @@ public class GameManager {
         System.out.println("Enemy health: " + curr_location.getEnemy().getHealth());
         System.out.println("Answer the questions to defeat the robots!");
         press_one_to_continue();
+        clearConsole();
         // go to multiple choice
         runQuizForCurrentLocation();
-        System.out.flush();
+        clearConsole();
 
     }
     
@@ -415,6 +418,11 @@ public class GameManager {
     {
         GameManager game_manager = new GameManager();
         game_manager.recordUsername();
+    }
+    
+    public static void clearConsole(){
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
 }
