@@ -82,6 +82,16 @@ public class GameManager {
         headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
         headquarters.addAction(new ActionChoice("Hack into a computer", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.", null, main_character));
         map.addLocation(headquarters);
+
+        //quiz obj.
+        office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
+        robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
+        hq_quiz = GovHeadquartersQuiz(input, main_character);
+
+        // location and their quiz
+        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
+        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
+        headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         
     }
     
@@ -377,21 +387,11 @@ public class GameManager {
     
     //quiz interation
     public void runQuizForCurrentLocation(){
-        Quiz quiz = null;
+        Quiz quiz = main_character.getCurrentLocation().getQuiz();
         
-        switch (main_character.getCurrentLocation().getName()){
-            case "Abandoned Office":
-                quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
-                break;
-            case "Robot Factory":
-                quiz = Quiz.RobotFactoryQuiz(input, main_character);
-                break;
-            case "Government Headquarters":
-                quiz = Quiz.GovHeadquartersQuiz(input, main_character);
-                break;
-            default:
-                System.out.println("No quiz avaliable.");
-                return;
+        if (quiz == null){
+            System.out.println("No quiz");
+            return;
         }
         
         System.out.println("The battle begins!!!!");
@@ -400,12 +400,8 @@ public class GameManager {
         if (result == 1){
             System.out.println("You defeated the AI Robots!!");
         } else {
-            System.out.println("You were defeated.. ");
-            main_character.takeDamage(20);
-            if (main_character.getHealth() <= 0){
-                System.out.println("You have died. GAME OVER");
-                System.exit(0);
-            }
+            System.out.println("Failed quiz. You were defeated.. ");
+            main_character.takeDamage(100); //make sure they die
         }
     }
     
