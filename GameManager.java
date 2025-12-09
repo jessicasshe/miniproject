@@ -2,11 +2,15 @@ import java.io.File;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 
 public class GameManager {
+    public static final String CYAN = "\u001b[36m";
+    public static final String RESET = "\u001b[0m";
+    public static final String RED = "\033[31m";
     private MainCharacter main_character;
     private static Scanner input = new Scanner(System.in);
     private AIRobot ai_robot;
@@ -28,19 +32,17 @@ public class GameManager {
 
     public GameManager()
     {
-
         // initialize MAP
         map = new TravelMap();
         
         // initialize enemies 
         ai_robot = new AIRobot(90, "EASY", "32321H8");
         ai_sentinel = new AISentinel(100, "HARD", "32135557");
-
-
+        
         // initialize HOME location (name, clue, title)
         home_clue = new Clue("File Folder", "For years, I have been researching how to get rid of these Evil AI robots form out city. Here is one piece of the algorithm to deconstruct them. Find the other two clues to save the city. - Father");
-        String home_title = Days.MON + " 2:00 AM - HOME, Jane St. Toronto";
-        home = new Location("Home", home_clue, home_title, false, null);
+        String home_title = CYAN+ Days.MON + " 2:00 AM - HOME, Jane St. Toronto"+ RESET;
+        home = new Location("Home", home_clue, home_title, false, null, null);
         
         // can now initialize main_character with home location
         main_character = new MainCharacter(null, 100, 30, home); 
@@ -52,10 +54,59 @@ public class GameManager {
 
         map.addLocation(home);
 
+        
+        // initialize QUIZ objects
+        office_quiz = new Quiz(input, main_character, ai_robot);
+        
+        ArrayList<String> options1 = new ArrayList<>();
+        options1.add("int(num)");
+        options1.add("Double y = double(x)");
+        options1.add("int x = 4; double y = x;");
+        
+        office_quiz.addQuestion(new Question("What is an example of implicit casting?", options1, 2));
+                
+        ArrayList<String> options2 = new ArrayList<>();
+        options2.add("Inheritance");
+        options2.add("General Association");
+        options2.add("Composition");
+        
+        office_quiz.addQuestion(new Question("Dog IS A Animal shows what type of relationship?", options2, 0));
+
+        factory_quiz = new Quiz(input, main_character, ai_sentinel);
+        ArrayList<String> options3 = new ArrayList<>();
+        options3.add("Public void main Person{");
+        options3.add("public class Person{");
+        options3.add("Person{");
+        
+        factory_quiz.addQuestion(new Question("What is the correct way to code an object class?", options3, 1));
+              
+        ArrayList<String> options4 = new ArrayList<>();
+        
+        options4.add("for");
+        options4.add("while");
+        options4.add("do");
+        
+        factory_quiz.addQuestion(new Question("____(int i = 0;, i<p, i++){ --> What type of loop is this??", options4, 0));
+
+        hq_quiz = new Quiz(input, main_character, null);
+        ArrayList<String> options5 = new ArrayList<>();
+        options5.add("O(n log n)");
+        options5.add(" O(n)");
+        options5.add(" O(n^2)");
+        hq_quiz.addQuestion(new Question("What is the time complexity of a Merge Sort?", options5, 0));
+                
+        ArrayList<String> options6 = new ArrayList<>();
+        options6.add("When you are trying to modify a value and already have a reference to the item");
+        options6.add("When you don't have a reference to the item and are trying to modify a value");
+        options6.add("When you are trying to search for a value");
+        hq_quiz.addQuestion(new Question("When should a LinkList be used over an ArrayList?", options6, 0));
+
+
+
         // initialize ABANDONED OFFICE location
-        String office_title = Days.MON + " 5:00 AM - 17 Arlington Avenue...";
+        String office_title = CYAN+Days.MON + " 5:00 AM - 17 Arlington Avenue..."+RESET;
         abandoned_clue = new Clue("USB Stick", "Message: Xyik]$ڒXݗ");
-        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot);
+        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
         office.setCutsceneText("You enter an abandoned office and look around...");
         office.setCombatText("Just as you put the USB stick away, you see an eerie-looking mechanical robot, sensing a violent encounter. Solve the code to defeat it!");
         office.addAction(new ActionChoice("Search a file cabinet", "You search the file cabinet and find a labelled USB Stick, which you think matches the one your father spoke about, containing documentation of the artificial intelligence technology. Press 1 to equip.", abandoned_clue, main_character));
@@ -64,9 +115,9 @@ public class GameManager {
         map.addLocation(office);
         
         // initialize ROBOT FACTORY location
-        String factory_title = Days.TUE + " 7:00 AM - TSMC...";
+        String factory_title = CYAN+Days.TUE + " 7:00 AM - TSMC..."+RESET;
         factory_clue = new Clue("Memory Chip", "Message: 01100101010");
-        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinel);
+        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinel, factory_quiz);
         robot_factory.setCutsceneText("The sun is rising as you arrive at the factory, entering through the back window - while avoiding cameras - you weave through many crates and spot a revolving conveyor belt with lots of hardware. You walk closer to...");
         robot_factory.setCombatText("Just as you put the memory chip away, you see 2 eerie-looking AI Sentinels, sensing a violent encounter you equip your computer. Solve the code to defeat it!");
         robot_factory.addAction(new ActionChoice("Inspect the hardware", "Inspecting hardware...\nItem found: Memory Chip.\n Press 1 to read its contents.", factory_clue, main_character));
@@ -75,10 +126,10 @@ public class GameManager {
         
         // initialize GOV HEADQUARTERS location
 
-        String hq_title = Days.WED + " 9:00 AM - City Hall...";
+        String hq_title = CYAN+Days.WED + " 9:00 AM - City Hall..."+RESET;
        // hq_actions.add("Use USB Contents");
        // hq_actions.add("Use Memory Chip Contents");
-        headquarters = new Location("Government Headquarters", null, hq_title, false, null);
+        headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
         headquarters.addAction(new ActionChoice("Hack into a computer", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.", null, main_character));
         map.addLocation(headquarters);
@@ -93,17 +144,56 @@ public class GameManager {
         robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
         headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         
+    } 
+
+    public int validateIntInput(String prompt, ArrayList<Integer> valid_options)
+    {
+        int user_choice = 0;
+        boolean invalid_input = true;
+        boolean option_found = false;
+        while(invalid_input)
+        {
+            try{
+                if(prompt != null)
+                {
+                System.out.println(prompt);
+                }
+                user_choice = input.nextInt();
+                for (Integer option : valid_options)
+                {
+                    if(option == user_choice) // valid 
+                    {
+                        option_found = true;
+                        invalid_input = false;
+                        break;
+                    }
+                }
+                if(!option_found)
+                {
+                    System.out.println("Please enter a valid option.");
+                    input.nextLine();
+                }
+            }
+            catch(InputMismatchException e)
+            {
+                System.out.println("Please enter an integer choice.");
+                input.nextLine();
+            }
+        }
+        return user_choice;
     }
     
     public void showStartingScreen()
     {
-        System.out.println("PROTOCOL: DECONSTRUCT");
+        System.out.println(CYAN + "PROTOCOL: DECONSTRUCT" + RESET);
+        
+        
         System.out.println("1 - Start");
         System.out.println("2 - Quit");
         System.out.println("3 - View Leaderboard");
-        
-        int user_choice = input.nextInt();
-        
+        // ADD EXCEPTION HANDLING HERE 
+        int user_choice = validateIntInput("Select an option:", new ArrayList<>(List.of(1, 2, 3)));
+        clearConsole();
         switch(user_choice)
         {
             case 1:
@@ -119,7 +209,7 @@ public class GameManager {
                 break;
         
         }
-        System.out.flush();
+
     }
     
     public void playBeginningCutscene()
@@ -129,12 +219,12 @@ public class GameManager {
         File cutscene_text = new File("beginning_cutscene.txt");
         Scanner cutscene_reader = new Scanner(cutscene_text);
 
-        System.out.println("Cutscene: The Beginning");
+        System.out.println(CYAN+"CUTSCENE: The Beginning"+RESET);
         while (cutscene_reader.hasNextLine()) // print text line by line
         {
             System.out.println(cutscene_reader.nextLine());
             try{
-            Thread.sleep(3000);
+            Thread.sleep(2000);
             }
             catch(InterruptedException e)
             {
@@ -142,26 +232,53 @@ public class GameManager {
             }
                 
         }
-        cutscene_reader.close();
-
-        System.out.println("Press 1 to begin your mission: ");
-        Scanner input = new Scanner(System.in);
-        int user_choice = input.nextInt(); // add validation later 
         
-        if(user_choice == 1)
-        {
-            clearConsole();
-            home.unlockLocation();
-            main_character.changeLocation(home);
-            showLocationCutscene();// call the first location cutscene method 
-        }
+        cutscene_reader.close();
+        
+        String user_choice = validateEnterPressed();
+        
+        clearConsole();
+        home.unlockLocation();
+        main_character.changeLocation(home);
+        showLocationCutscene();// call the first location cutscene method 
+        
         }
         catch (IOException e)
         {
-            System.out.println("Something went wrong.");
+            System.out.println("Something went wrong while loading the file.");
         }
-        clearConsole();
     }
+    
+    public String validateEnterPressed()
+    {
+        boolean invalid_input = true;
+        String user_input = null;
+        while(invalid_input)
+        {
+            System.out.println("Press ENTER to continue:");
+            try
+            {
+                user_input = input.nextLine();
+                user_input = input.nextLine();
+                if(user_input.isEmpty())
+                {
+                    invalid_input = false;
+                }
+                else
+                {
+                    System.out.println("Invalid input, please try again.");
+                    input.nextLine();
+                }
+            }
+            catch(InputMismatchException e)
+            {
+                System.out.println("Please press the enter key.");
+                input.nextLine();
+            }
+        }
+        return user_input;
+    }
+    
     
     public void showLocationCutscene()
     {
@@ -176,35 +293,37 @@ public class GameManager {
         
         while(clue_not_found)
         {
+            ArrayList<Integer> action_indexes = new ArrayList<>();
             System.out.println("Select an action: ");
             for (int i = 0; i < users_curr_location.getActions().size(); i++)
             {
                 System.out.println(i+1 + ". " + users_curr_location.getActions().get(i).getText());
+                action_indexes.add(i+1);
+                
             }
             
-            // get user input for action selected
-            int action_num = input.nextInt(); 
+            int action_num = validateIntInput("Select an action:", action_indexes);
             ActionChoice action_chosen = users_curr_location.getActions().get(action_num-1); // entire object
             System.out.println(action_chosen.getResult()); // get action's result text
 
             if(users_curr_location.getName().equals("Government Headquarters"))
             {
-                clue_not_found = false; 
+                clue_not_found = false;
+                showCombatCutscene(users_curr_location);
                 showEndingCutscene();
                 showEndingStats(); // end of program
             }
 
             else
             {
-                press_one_to_continue();
-                clearConsole();
+
                 if(action_chosen.hasClue())
                 {
+                    validateIntInput(null, new ArrayList<>(List.of(1)));
                     main_character.analyze();
                     System.out.println(users_curr_location.getClue().getText());
                     main_character.pickUpClue(users_curr_location.getClue());
-
-                    press_one_to_continue();
+                    validateEnterPressed();
                     clearConsole();
                     if(users_curr_location.hasCombat())
                     {
@@ -260,73 +379,63 @@ public class GameManager {
             System.out.println("Clue unlocked! " + (3-main_character.getCluesCollected().size()) + " more to go...");
         }
         main_character.getCurrentLocation().lockLocation();
-        System.out.println("Press 1 to open the travel map: ");
-        // validate input
+
+        validateIntInput("Press 1 to open the travel map: ", new ArrayList<Integer>(List.of(1)));
         displayTravelMap();
     }
     
     
     public void displayTravelMap()
     {
-        boolean invalid_choice = true;
+        System.out.println("\nTRAVEL MAP");
+        printDivider();
         
-        while(invalid_choice)
+        ArrayList<Integer> location_indexes = new ArrayList<>();
+        
+        for (int i = 0; i < map.getLocations().size(); i++)
         {
-            System.out.println("\nTRAVEL MAP");
-            printDivider();
-            for (int i = 0; i < map.getLocations().size(); i++)
-            {
-                System.out.println(i+1 + ". " + map.getLocations().get(i).getName() + " -- UNLOCKED: " + map.getLocations().get(i).isUnlocked());
-            }
-            
-            System.out.println("Select the next location to visit: ");
-        
-        // get user input
+            System.out.println(i+1 + ". " + map.getLocations().get(i).getName() + " -- UNLOCKED: " + map.getLocations().get(i).isUnlocked());
+            location_indexes.add(i+1);
 
-            int choice = -1;
-            try{
-                choice = input.nextInt();
-            } catch (InputMismatchException e){
-                System.out.println("Invalid input. Please enter a number.");
-                input.nextLine();
-                return;
-            }
-            
-            if (choice > 0 && choice <= map.getLocations().size()){
-                Location chosenLocation = map.getLocations().get(choice-1);
-                
-                if (chosenLocation.isUnlocked()){
-                    clearConsole();
-                    main_character.changeLocation(chosenLocation);
-                    showLocationCutscene();
-                    invalid_choice = false;
-                } else {
-                    System.out.println("This location is locked...");
-                }
-            } else {
-                System.out.println("Invalid selection, please try again.");
-            }
         }
+        
+        int user_choice = validateIntInput("Select the next location to visit:", location_indexes);
+
+        Location chosenLocation = map.getLocations().get(user_choice-1);
+            
+        if (chosenLocation.isUnlocked()){
+            clearConsole();
+            main_character.changeLocation(chosenLocation);
+            showLocationCutscene();
+            } 
+        else {
+            System.out.println("This location is locked...");
+            }
     }
     
     public void showCombatCutscene(Location curr_location) // use the same local variable
     {
-        // switch to users current location 
         
-        System.out.println("DANGER!");
-        printDivider();
-        
-        System.out.println(curr_location.getCombatText());
-        System.out.println("Enemy name: " + curr_location.getEnemy().getName());
-        System.out.println("Enemy difficulty: " + curr_location.getEnemy().getDifficultyLevel());
-        System.out.println("Enemy health: " + curr_location.getEnemy().getHealth());
-        System.out.println("Answer the questions to defeat the robots!");
-        press_one_to_continue();
-        clearConsole();
-        // go to multiple choice
+        if(!curr_location.equals("Government Headquarters"))
+        {
+            System.out.println(RED+"DANGER!"+RESET);
+            printDivider();
+            
+            System.out.println(curr_location.getCombatText());
+            System.out.println("Enemy name: " + curr_location.getEnemy().getName());
+            System.out.println("Enemy difficulty: " + curr_location.getEnemy().getDifficultyLevel());
+            System.out.println("Enemy health: " + curr_location.getEnemy().getStartingHealth());
+            System.out.println("Answer the questions to defeat the robots!");
+            clearConsole();
+        }
+        else
+        {
+            System.out.println("Beginning the hack...");
+            System.out.println("Use your intelligence to construct the final algorithm!");
+        }
+        validateEnterPressed();
         runQuizForCurrentLocation();
         clearConsole();
-
     }
     
     public void recordUsername() {
@@ -363,7 +472,7 @@ public class GameManager {
                 System.out.println("Username taken, please try again.");
             }
         }
-        
+        clearConsole();
         showStartingScreen();
 
     } catch (IOException e) {
@@ -371,37 +480,25 @@ public class GameManager {
     }
 }
     
-    // public void press_-1_to_quit()
-
-    public void press_one_to_continue()
-    {
-        System.out.println("Press 1 to continue: ");
-        int num = -1;
-        try {
-            num = input.nextInt();
-            input.nextLine();
-        } catch (InputMismatchException e){
-            System.out.println("Invalid input. Press 1 to continue.");
-        }
-    }
-    
-    //quiz interation
     public void runQuizForCurrentLocation(){
-        Quiz quiz = main_character.getCurrentLocation().getQuiz();
         
-        if (quiz == null){
-            System.out.println("No quiz");
-            return;
-        }
+        // find current quiz object using user's current location
+        Quiz quiz_for_location = main_character.getCurrentLocation().getQuiz();
         
-        System.out.println("The battle begins!!!!");
-        int result = quiz.startQuiz();
+        System.out.println("THE BATTLE BEGINS");
+        printDivider();
+        int result = quiz_for_location.startQuiz();
         
-        if (result == 1){
+        if (result == 1){ // perfect score 
             System.out.println("You defeated the AI Robots!!");
         } else {
-            System.out.println("Failed quiz. You were defeated.. ");
-            main_character.takeDamage(100); //make sure they die
+            System.out.println("Your skills were lacking and you got questions wrong!");
+            System.out.println("You were defeated.. ");
+            main_character.takeDamage(20); // lose hp in increments instead
+            if (main_character.getHealth() <= 0){
+                System.out.println("You have died. GAME OVER");
+                System.exit(0);
+            }
         }
     }
     
