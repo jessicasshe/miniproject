@@ -133,6 +133,16 @@ public class GameManager {
         headquarters.setCutsceneText("With all the clues collected, you make your way to the Government's headquarters. You know from your father's file that this is where you need to enter the complete algorithm to shut down the malicious AI for good. ");
         headquarters.addAction(new ActionChoice("Hack into a computer", "The robots have been deconstructed and the city is safe again. Your father's mission is complete.", null, main_character));
         map.addLocation(headquarters);
+
+        //quiz obj.
+        office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
+        robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
+        hq_quiz = GovHeadquartersQuiz(input, main_character);
+
+        // location and their quiz
+        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
+        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
+        headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         
     } 
 
@@ -322,6 +332,7 @@ public class GameManager {
                     clue_not_found = false;
                     map.unlockNextLocation(users_curr_location); 
                     printClueUnlockedMessage();
+                    press_one_to_continue();
                 }
             }
         }

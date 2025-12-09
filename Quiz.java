@@ -10,6 +10,13 @@ public class Quiz {
     private MainCharacter player;
     //private int totalQuizAttempts;
     //private final int maxQuizAttempts = 3;
+    //new attributes
+    private int userHP;
+    private int enemyHP;
+    private int userMaxHP;
+    private int enemyMaxHP;
+    private int userHitPerWrong;
+    private int enemyHitPerCorrect;
     
     
     public Quiz(Scanner theScanner, MainCharacter playerCharacter){
@@ -23,6 +30,14 @@ public class Quiz {
     public void addQuestions(Question question){
         questions.add(question);
     }
+    //this is to help set up combat
+    public void setUpCombat(int userMax, int enemyMax, int damageToUser, int damageToEnemy){
+        this.userMaxHP = userMax;
+        this.enemyMaxHP = enemyMax;
+        this.userHitPerCorrect = damageToUser;
+        this.enemyHitPerCorrect = damageToEnemy;
+        this.userHP = userMax;
+        this.enemyHP = enemyMax;
     
     public int startQuiz(){
         System.out.println("Answer the questions to defeat the robots!!!");
@@ -73,18 +88,37 @@ public class Quiz {
             
                 if (currentQuestion.isCorrect(userAnswer - 1)){
                     System.out.println("correct!");
+                    enemyHP -= enemyHitPerCorrect;
+                    System.out.println("The AI took "+enemyHitPerCorrect+" damage! HP now: "+enemyHP);
+                    if (enemyHP <= 0){
+                        System.out.println("enemy defeated!");
+                        return 1;
+                    }
                     if (currentQuestion.getAttemptsRemaining() == initialAttempts){
                         quizScore++;
                     }
                     questionCorrectInCurrentAttempt = true;
                 } else {
+                    userHP -= userHitPerWrong;
+                    System.out.println("Incorrect. You took "+userHitPerWrong+" damage! HP now: " +userHP);
+                    if (userHP <= 0){
+                        System.out.println("You died. GAME OVER.");
+                        return 0;
+                    }
                     currentQuestion.decrementAttempts();
-                    System.out.println("Incorrect. You have "+ currentQuestion.getAttemptsRemaining()+" attempts left");
+                    System.out.println("You have "+ currentQuestion.getAttemptsRemaining()+" attempts left");
                     if (currentQuestion.getAttemptsRemaining() == 0){
                         System.out.println("You've run out of attempts. GAME OVER.");
                         allQuestionsCorrect = false;
                     }
                 }
+                player.takeDamage(userDamagePerQuestion);
+                enemy.takeDamage(enemyDamagePerQuestion);
+
+                System.out.println("---STATUS---"); //player can clearly see current health and enemy health
+                System.out.println("Your HP: "player.getHealth()+"/"+player.getMaxHealth());
+                System.out.println("Enemy HP: "enemy.getHealth()+"/"enemy.getMaxHealth());
+                
             }
             if (!questionCorrectInCurrentAttempt && currentQuestion.getAttemptsRemaining() > 0){
                 allQuestionsCorrect = false;
