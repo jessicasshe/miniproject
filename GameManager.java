@@ -393,16 +393,39 @@ public class GameManager {
             System.out.println("No quiz");
             return;
         }
+
+        Enemy enemyz = main_character.getCurrentLocation().getEnemy();
+        if(enemy == null){
+            System.out.println("No enemy's here");
+            return;
+        }
+        int userMaxHP = 100;
+        int enemyMaxHP = enemy.getHealth();
         
         System.out.println("The battle begins!!!!");
-        int result = quiz.startQuiz();
+        int attempts = 3;
+        while (attempts > 0){
+            //reset hp
+            int userHP = userMaxHP;
+            int enemyHP = enemyMaxHP;
+
+            System.out.println("Your HP: "+userHP+"/"+userMaxHP);
+            System.out.println("Enemy HP: "+enemyHP+"/"+enemyMaxHP");
+            
+            //quiz.setupCombat(main_character, main_character.getCurentLocation().getEnemy());
+            int result = quiz.startQuiz();
         
-        if (result == 1){
-            System.out.println("You defeated the AI Robots!!");
-        } else {
-            System.out.println("Failed quiz. You were defeated.. ");
-            main_character.takeDamage(100); //make sure they die
-        }
+            if (result == 1){
+                System.out.println("You defeated the AI Robots!!");
+                return 1;
+            } else {
+                attempts--;
+                System.out.println("Failed quiz. You were defeated.. ");
+                main_character.takeDamage(60);
+                if (main_character.getHealth() <= 0){
+                    System.out.println("You have died. GAME OVER");
+                    return 0;
+            }
     }
     
     public void printDivider()
