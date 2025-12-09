@@ -77,24 +77,61 @@ public class Quiz {
                         quizScore++;
                     }
                     questionCorrectInCurrentAttempt = true;
+                    //enemy damage
+                    if (player.getCurrentLocation().getEnemy() != null){
+                        Enemy enemy = player.getCurrentLocation().getEnemy();
+                        int damage = 0;
+                        //damage to enemy
+                        if(enemy.getName().equals("AI Robot")){
+                            damage = 30;
+                        }
+                        else if(enemy.getName().equals("AI Sentinel")){
+                            damage = 30;
+                        }
+                        enemy.takeDamage(damage);
+                        System.out.println("Enemy HP after attack: "+enemy.getHealth());
+                    }
                 } else {
+                    int damage = 0;
+                    if (player.getCurrentLocation().getEnemy() != null){
+                        Enemy enemy = player.getCurrentLocation().getEnemy();
+
+                        if (enemy.getName().equals("AI Robot")){
+                            damage = 20;
+                        }
+                        else if(enemy.getName().equals("AI Sentinel")){
+                            damage = 30;
+                        }
+                    }
+                    player.takeDamage(damage);
                     currentQuestion.decrementAttempts();
+                    System.out.println("Incorrect. You take "+damage+" damage. Remaining HP: "+player.getHealth());
                     System.out.println("Incorrect. You have "+ currentQuestion.getAttemptsRemaining()+" attempts left");
+                    
                     if (currentQuestion.getAttemptsRemaining() == 0){
-                        System.out.println("You've run out of attempts. GAME OVER.");
-                        allQuestionsCorrect = false;
+                    System.out.println("You've run out of attempts.");
+                    allQuestionsCorrect = false;
+                    }
+                    if(player.getHealth() <= 0){
+                        System.out.println("You have died. GAME OVER");
+                        //r
                     }
                 }
-            }
-            if (!questionCorrectInCurrentAttempt && currentQuestion.getAttemptsRemaining() > 0){
-                allQuestionsCorrect = false;
+                if(player.getCurrentLocation().getEnemy() != null){
+                    Enemy enemy = player.getCurrentLocation().getEnemy();
+                    System.out.println("Your HP: "+player.getHealth()+"/100");
+                    System.out.println("Enemy HP: "+enemy.getHealth()+"/"+ enemy.getHealth());
+                    }
+                        
+            //if (!questionCorrectInCurrentAttempt && currentQuestion.getAttemptsRemaining() > 0){
+              //  allQuestionsCorrect = false;
             }
             
         }
     
     //totalQuizAttempts--;
     
-    System.out.println("Finished!");
+    //System.out.println("Finished!");
     System.out.println("Your score for this round is: "+quizScore+" out of "+questions.size());
     
     if (quizScore == questions.size() && allQuestionsCorrect){
