@@ -38,9 +38,13 @@ public class Quiz {
         this.enemyHitPerCorrect = damageToEnemy;
         this.userHP = userMax;
         this.enemyHP = enemyMax;
+    }
     
     public int startQuiz(){
         System.out.println("Answer the questions to defeat the robots!!!");
+
+        userHP = userMaxHP; //restart HP
+        enemyHP = enemyMaxHP;
         
         int quizScore = 0;
         boolean allQuestionsCorrect = true;
@@ -148,7 +152,8 @@ public static Quiz AbandonedOfficeQuiz(Scanner scanner, MainCharacter player){
                 
         List<String> options2 = List.of("Inheritance","General Association","Composition");
         quiz.addQuestions(new Question("Dog IS A Animal shows what type of relationship?", options2, 0));
-        
+
+        quiz.setUpCombat(100,100);
         return quiz;
     } 
 public static Quiz RobotFactoryQuiz(Scanner scanner, MainCharacter player){
@@ -159,7 +164,8 @@ public static Quiz RobotFactoryQuiz(Scanner scanner, MainCharacter player){
                 
         List<String> options4 = List.of("for","while","do");
         quiz.addQuestions(new Question("____(int i = 0;, i<p, i++){ --> What type of loop is this??", options4, 0));
-        
+
+        quiz.setUpCombat(100, 100); //robot 100hp
         return quiz;
     }
 public static Quiz GovHeadquartersQuiz(Scanner scanner, MainCharacter player){
@@ -170,7 +176,8 @@ public static Quiz GovHeadquartersQuiz(Scanner scanner, MainCharacter player){
                 
         List<String> options6 = List.of("When you are trying to modify a value and already have a reference to the item","When you don't have a reference to the item and are trying to modify a value","When you are trying to search for a value");
         quiz.addQuestions(new Question("When should a LinkList be used over an ArrayList?", options6, 0));
-        
+
+        quiz.setUpCombat(100, 150); //sentinel 150hp
         return quiz;
     }
 
