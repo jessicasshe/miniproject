@@ -135,14 +135,14 @@ public class GameManager {
         map.addLocation(headquarters);
 
         //quiz obj.
-        office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
-        robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
-        hq_quiz = GovHeadquartersQuiz(input, main_character);
+        //office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
+        //robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
+        //hq_quiz = GovHeadquartersQuiz(input, main_character);
 
         // location and their quiz
-        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
-        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
-        headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
+        //office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
+        //robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
+        //headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         
     } 
 
@@ -481,14 +481,15 @@ public class GameManager {
 }
     
     public void runQuizForCurrentLocation(){
-        
+
+        Quiz quiz = main_character.getCurrentLocation().getQuiz();
         if (quiz == null){
             System.out.println("No quiz");
             return;
         }
 
         Enemy enemyz = main_character.getCurrentLocation().getEnemy();
-        if(enemy == null){
+        if(enemyz == null){
             System.out.println("No enemy's here");
             return;
         }
@@ -510,14 +511,14 @@ public class GameManager {
         
             if (result == 1){
                 System.out.println("You defeated the AI Robots!!");
-                return 1;
+                return ;//1
             } else {
                 attempts--;
                 System.out.println("Failed quiz. You were defeated.. ");
                 main_character.takeDamage(60);
                 if (main_character.getHealth() <= 0){
                     System.out.println("You have died. GAME OVER");
-                    return 0;
+                    return ;//0
             }
     }
     
