@@ -17,13 +17,15 @@ public class Quiz {
     private int enemyMaxHP;
     private int userHitPerWrong;
     private int enemyHitPerCorrect;
+    private Enemy enemy;
     
     
-    public Quiz(Scanner theScanner, MainCharacter playerCharacter){
+    public Quiz(Scanner theScanner, MainCharacter playerCharacter, Enemy enemy){
         this.questions = new ArrayList<>();
         //this.score = 0;
         this.scanner = theScanner;
         this.player = playerCharacter;
+        this.enemy = enemy;
         //this.totalQuizAttempts = maxQuizAttempts;
     }
     
@@ -38,6 +40,7 @@ public class Quiz {
         this.enemyHitPerCorrect = damageToEnemy;
         this.userHP = userMax;
         this.enemyHP = enemyMax;
+    }
     
     public int startQuiz(){
         System.out.println("Answer the questions to defeat the robots!!!");
@@ -116,8 +119,8 @@ public class Quiz {
                 enemy.takeDamage(enemyDamagePerQuestion);
 
                 System.out.println("---STATUS---"); //player can clearly see current health and enemy health
-                System.out.println("Your HP: "player.getHealth()+"/"+player.getMaxHealth());
-                System.out.println("Enemy HP: "enemy.getHealth()+"/"enemy.getMaxHealth());
+                System.out.println("Your HP: "+player.getHealth()+"/"+player.getMaxHealth());
+                System.out.println("Enemy HP: "+enemy.getHealth()+"/"+enemy.getMaxHealth());
                 
             }
             if (!questionCorrectInCurrentAttempt && currentQuestion.getAttemptsRemaining() > 0){
