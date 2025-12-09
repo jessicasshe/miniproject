@@ -135,14 +135,14 @@ public class GameManager {
         map.addLocation(headquarters);
 
         //quiz obj.
-        office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
-        robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
-        hq_quiz = GovHeadquartersQuiz(input, main_character);
+        //office_quiz = Quiz.AbandonedOfficeQuiz(input, main_character);
+        //robot_factory = Quiz.RobotFactoryQuiz(input, main_character);
+        //hq_quiz = GovHeadquartersQuiz(input, main_character);
 
         // location and their quiz
-        office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
-        robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
-        headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
+        //office = new Location("Abandoned Office", abandoned_clue, office_title, true, ai_robot, office_quiz);
+        //robot_factory = new Location("Robot Factory", factory_clue, factory_title, true, ai_sentinal, factory_quiz);
+        //headquarters = new Location("Government Headquarters", null, hq_title, false, null, hq_quiz);
         
     } 
 
