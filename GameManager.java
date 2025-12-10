@@ -1063,25 +1063,45 @@ public class GameManager {
 }
     
     public void runQuizForCurrentLocation(){
-        
-        // find current quiz object using user's current location
-        Quiz quiz_for_location = main_character.getCurrentLocation().getQuiz();
-        
-        System.out.println("THE BATTLE BEGINS");
-        printDivider();
-        int result = quiz_for_location.startQuiz();
-        
-        if (result == 1){ // perfect score 
-            System.out.println("You defeated the AI Robots!!");
-        } else {
-            System.out.println("Your skills were lacking and you got questions wrong!");
-            System.out.println("You were defeated.. ");
-            main_character.takeDamage(20); // lose hp in increments instead
-            if (main_character.getHealth() <= 0){
-                System.out.println("You have died. GAME OVER");
-                System.exit(0);
-            }
+
+        Quiz quiz = main_character.getCurrentLocation().getQuiz();
+        if (quiz == null){
+            System.out.println("No quiz");
+            return;
         }
+
+        Enemy enemyz = main_character.getCurrentLocation().getEnemy();
+        if(enemyz == null){
+            System.out.println("No enemy's here");
+            return;
+        }
+        int userMaxHP = 100;
+        int enemyMaxHP = enemy.getHealth();
+        
+        System.out.println("The battle begins!!!!");
+        int attempts = 3;
+        while (attempts > 0){
+            //reset hp
+            int userHP = userMaxHP;
+            int enemyHP = enemyMaxHP;
+
+            System.out.println("Your HP: "+userHP+"/"+userMaxHP);
+            System.out.println("Enemy HP: "+enemyHP+"/"+enemyMaxHP");
+            
+            //quiz.setupCombat(main_character, main_character.getCurentLocation().getEnemy());
+            int result = quiz.startQuiz();
+        
+            if (result == 1){
+                System.out.println("You defeated the AI Robots!!");
+                return ;//1
+            } else {
+                attempts--;
+                System.out.println("Failed quiz. You were defeated.. ");
+                main_character.takeDamage(60);
+                if (main_character.getHealth() <= 0){
+                    System.out.println("You have died. GAME OVER");
+                    return ;//0
+            }
     }
     
     public void printDivider()
