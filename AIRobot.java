@@ -5,10 +5,13 @@ public class AIRobot extends Enemy{
         super(health, difficultyLevel, name);
     }
     
-    public String attack(){ // use this instead of user's method to show association ltr
-        // lower user HP
-        return "You take " + (attackDamage*2) + " damage from the attack.";
+
+    public String getDifficultyLevel()
+    {
+        return GREEN+difficultyLevel+RESET;
     }
 
-    
-}
+    public int getStartingHealth()
+    {
+        return 100;
+    }
