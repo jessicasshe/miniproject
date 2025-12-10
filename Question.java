@@ -1,18 +1,18 @@
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Question {
     private String questionText;
-    private List<String> options;
+    private ArrayList<String> options;
     private int correctAnswerIndex;
     private int attemptsRemaining;
-    private final int MAX_ATTEMPTS = 3;
+    private final int MAX_ATTEMPTS = 3; // per question
     
-    public Question(String questionText, List<String> options, int correctAnswerIndex){
+    public Question(String questionText, ArrayList<String> options, int correctAnswerIndex){
         this.questionText = questionText;
         this.correctAnswerIndex = correctAnswerIndex;
-        this.options = new ArrayList<>(options);
+        this.options = options;
         this.attemptsRemaining = MAX_ATTEMPTS;
     }
     
@@ -20,20 +20,12 @@ public class Question {
         return questionText;
     }
     
-    public List<String> getOptions(){
+    public ArrayList<String> getOptions(){
         return options;
     }
     
     public boolean isCorrect(int selectedOptionIndex){
         return selectedOptionIndex == correctAnswerIndex;
-    }
-    
-    //they can try twice
-    public void displayQuestion(){
-        System.out.println(questionText);
-        for (int i = 0; i < options.size(); i++){
-            System.out.println((i + 1)+". "+options.get(i));
-        }
     }
     
     public int getAttemptsRemaining(){
@@ -46,6 +38,10 @@ public class Question {
     
     public int getCorrectAnswerIndex(){
         return correctAnswerIndex;
+    }
+    
+    public void resetAttempts(){
+        this.attemptsRemaining = MAX_ATTEMPTS;
     }
     
 }
