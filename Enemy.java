@@ -1,14 +1,17 @@
 public abstract class Enemy{
-    private int health;
-    private String name;
-    private String difficultyLevel;
-    public int attackDamage;
+    protected int health;
+    protected String name;
+    protected String difficultyLevel;
+    protected static final String RED = "\033[31m";
+    protected static final String GREEN = "\u001B[32m";
+    public static final String RESET = "\u001b[0m";
+
+
     
-    public Enemy(int health, String difficultyLevel, String name){
+    public Enemy(int health, String difficultyLevel, String name){ //int damagePerAnswer
         this.health = health;
         this.difficultyLevel = difficultyLevel;
         this.name = name;
-        this.attackDamage = 10;
     }
     
     public String getName(){
@@ -19,17 +22,33 @@ public abstract class Enemy{
         return health;
     }
     
-    public String getDifficultyLevel(){
-        return this.difficultyLevel;
+    public abstract int getStartingHealth();
+    
+    public String getDifficultyLevel()
+    {
+        return difficultyLevel;
     }
     
-    public abstract String attack();
+    public void attack(int damage, MainCharacter player)
+    {
+        player.takeDamage(damage);
+    }
     
-    public void takeDamage(int damage){
-        this.health -= damage;
-        System.out.println(name +" took "+damage+" damage.");
-        if (this.health <= 0){
-            System.out.println(name+" has been defeated");
-        }
+    public void takeDamage(int damage)
+    {
+        health -= damage;
+        System.out.println(name+" took " + damage + " damage");
+    }
+    
+    //public int getAttackDamageValue(){
+      //  return attackDamage;
+    //}
+    
+    public int damage_taken_per_ans(){ 
+        return getStartingHealth() /2;
+    }
+    
+    public void reset_health_to_starting(){
+        health = getStartingHealth();
     }
 }
