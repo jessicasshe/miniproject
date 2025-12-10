@@ -5,10 +5,20 @@ public class AISentinel extends Enemy{
         super(health, difficultyLevel, name);
     }
     
-    public String attack(){
-        // lower user HP
-        return "You take " + (attackDamage*4) + " damage from the attack.";
+    public int getStartingHealth()
+    {
+        return 150;
     }
+    
+    public String getDifficultyLevel()
+    {
+        return RED+difficultyLevel+RESET;
+    }
+    
+
+    //public int getAttackDamageValue(){
+      //  return attackDamage * 4;
+    //}
 
     
 }
